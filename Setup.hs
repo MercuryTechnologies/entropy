@@ -106,7 +106,14 @@ checkGetentropy cc lbi = do
   where cArgs = ["-DHAVE_GETENTROPY"]
 
 myRawSystemExitCode :: Verbosity -> FilePath -> [String] -> IO ExitCode
-#if __GLASGOW_HASKELL__ >= 704
+#if __GLASGOW_HASKELL__ >= 906
+-- Modified in unreleased (as of 2024-09-09) changes:
+-- https://github.com/haskell/cabal/commit/7b9058328e162a4cb707b5d5b25cd1d2df66680e
+-- https://github.com/haskell/cabal/commit/ee11ac6c7badc452def79116729bd16aea15c0df
+myRawSystemExitCode verbosity program arguments =
+    -- Added CWD and environment arguments.
+    rawSystemExitCode verbosity Nothing program arguments Nothing
+#elif __GLASGOW_HASKELL__ >= 704
 -- We know for sure, that if GHC >= 7.4 implies Cabal >= 1.14
 myRawSystemExitCode = rawSystemExitCode
 #else
